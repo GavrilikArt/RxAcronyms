@@ -1,4 +1,7 @@
 PODS:
+  - Action (4.2.0):
+    - RxCocoa (< 7.0, >= 5.0)
+    - RxSwift (< 7.0, >= 5.0)
   - Differentiator (4.0.1)
   - Realm (10.8.0):
     - Realm/Headers (= 10.8.0)
@@ -26,6 +29,7 @@ PODS:
     - RxSwift (~> 5)
 
 DEPENDENCIES:
+  - Action (~> 4.0)
   - RealmSwift (~> 10.0)
   - RxBlocking (~> 5.1.1)
   - RxCocoa (~> 5.1.1)
@@ -36,6 +40,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Action
     - Differentiator
     - Realm
     - RealmSwift
@@ -48,6 +53,7 @@ SPEC REPOS:
     - RxTest
 
 SPEC CHECKSUMS:
+  Action: 5dc2194f7a0b77857c82a677b0da655f197c005f
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   Realm: ad3c5cd762e5a5bc02080fc55aa04a0e43f98575
   RealmSwift: 316e450478fb01e06ece4438dda42f407c5f51d2
@@ -59,6 +65,6 @@ SPEC CHECKSUMS:
   RxSwift: 1e2e1f9570186967f617e49128ed26ccf1bafc8e
   RxTest: 274549b747dca56f47c52c8991ec5cf797ecfe40
 
-PODFILE CHECKSUM: e2d260fe4ae76b3190f8cc5db55b69b0d441437a
+PODFILE CHECKSUM: a05ab205e229cac4cb81eb382767fb1389f7690d
 
 COCOAPODS: 1.10.1

@@ -8,6 +8,7 @@ target 'RxAcronyms' do
     pod 'RxDataSources', '~> 4.0'
     pod 'RealmSwift', '~> 10.0'
     pod 'RxRealm', '~> 4.0.2'
+    pod 'Action', '~> 4.0'
 end
 
 target 'RxAcronymsTests' do
