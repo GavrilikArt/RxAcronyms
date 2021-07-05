@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import Action
 import RxDataSources
 
 
@@ -14,15 +15,18 @@ import RxDataSources
 class DetailAcronymViewModel {
   let acronym: Acronym?
   let acronymRequest: AcronymRequest?
+  let navController: UINavigationController?
   
   init() {
     acronym = nil
     acronymRequest = nil
+    navController = nil
   }
   
-  init(acronym: Acronym) {
+  init(acronym: Acronym, nav: UINavigationController?) {
     self.acronym = acronym
     self.acronymRequest = AcronymRequest(acronymID: acronym.id!)
+    self.navController = nav
   }
   
   func getSections() -> Observable<[MyStringSection]> {
@@ -39,6 +43,17 @@ class DetailAcronymViewModel {
       ]
     }
   }
+  
+  lazy var editAction: CocoaAction = { [weak self] in
+    return CocoaAction {
+      let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+      let createAcronymVC = storyboard.instantiateViewController(withIdentifier: "CreateAcronym") as! CreateAcronymViewController
+      createAcronymVC.viewModel = CreateAcronymViewModel(acronym: self?.acronym,
+                                                         nav: self?.navController)
+      self?.navController?.pushViewController(createAcronymVC, animated: true)
+      return Observable.empty()
+    }
+  }()
   
   func categories() -> Observable<[Category]> {
     return acronymRequest!.getCategories()

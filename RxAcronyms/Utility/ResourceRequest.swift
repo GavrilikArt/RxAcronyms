@@ -15,11 +15,46 @@ struct ResourceRequest<ResourceType> where ResourceType: Codable {
   }
   
   func getAll() -> Observable<[ResourceType]> {
-    return URLSession.shared.rx.data(request: URLRequest(url: resourceURL))
+    var url: URL = resourceURL
+    if ResourceType.self == Acronym.self {
+      url = resourceURL.appendingPathComponent("sorted")
+    }
+    return URLSession.shared.rx.data(request: URLRequest(url: url))
       .map { data in
         let resources = try JSONDecoder().decode([ResourceType].self, from: data)
+        print("Counting Ressss ... \n\n\n")
+        print(resources.count)
         return resources
       }
-      .catchErrorJustReturn([])
+      .catchError { error in
+        print(error)
+        return .empty()
+      }
+  }
+  
+  func save<CreateType>(saveData: CreateType) -> Observable<Void>
+  where CreateType: Codable {
+    guard let token = Auth().token else {
+      Auth().logout()
+      return Observable.empty()
+    }
+    
+    var urlRequest = URLRequest(url: resourceURL)
+    urlRequest.httpMethod = "POST"
+    urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+    urlRequest.httpBody = try? JSONEncoder().encode(saveData)
+    return URLSession.shared.rx
+      .response(request: urlRequest)
+      .map { response, data in
+        if response.statusCode == 200 {
+          return
+        }
+        if response.statusCode == 401 {
+          Auth().logout()
+          return
+        }
+      }
   }
 }

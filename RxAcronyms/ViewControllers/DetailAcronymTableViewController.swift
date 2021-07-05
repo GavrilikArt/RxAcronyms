@@ -10,26 +10,9 @@ import RxDataSources
 import RxSwift
 import RxCocoa
 
-struct MyStringSection {
-  var header: String
-  var items: [Item]
-}
-
-extension MyStringSection: AnimatableSectionModelType {
-  typealias Item = String
-  
-  var identity: String {
-    return header
-  }
-  
-  init(original: MyStringSection, items: [Item]) {
-    self = original
-    self.items = items
-  }
-}
-
-
 class DetailAcronymTableViewController: UITableViewController {
+  
+  @IBOutlet weak var editButton: UIBarButtonItem!
   
   let bag = DisposeBag()
   var viewModel = DetailAcronymViewModel()
@@ -53,6 +36,8 @@ class DetailAcronymTableViewController: UITableViewController {
       }
     )
     self.dataSource = dataSource
+    
+    editButton.rx.action = viewModel.editAction
     
     viewModel.getSections()
       .bind(to: tableView.rx.items(dataSource: self.dataSource!))

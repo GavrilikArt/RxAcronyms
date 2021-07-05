@@ -3,6 +3,7 @@ use_frameworks!
 platform :ios, '14.1'
 
 target 'RxAcronyms' do
+	pod 'RxTimelane', '1.0.9'
     pod 'RxSwift', '~>5.1.1'
     pod 'RxCocoa', '~>5.1.1'
     pod 'RxDataSources', '~> 4.0'

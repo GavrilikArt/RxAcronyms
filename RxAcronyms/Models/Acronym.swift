@@ -1,4 +1,5 @@
 import Foundation
+import RxDataSources
 
 final class Acronym: Codable {
   var id: UUID?
@@ -11,6 +12,18 @@ final class Acronym: Codable {
     self.long = long
     let user = AcronymUser(id: userID)
     self.user = user
+  }
+}
+
+extension Acronym: IdentifiableType {
+  var identity: String {
+    self.id?.uuidString ?? "0"
+  }
+}
+
+extension Acronym: Equatable {
+  static func == (lhs: Acronym, rhs: Acronym) -> Bool {
+    lhs.id == rhs.id
   }
 }
 

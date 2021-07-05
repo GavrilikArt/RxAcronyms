@@ -9,95 +9,109 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxDataSources
+import RxTimelane
+
+
 
 class AcronymsTableViewController: UITableViewController {
   
+  @IBOutlet weak var addAcronym: UIBarButtonItem!
+  @IBOutlet weak var refresh: UIBarButtonItem!
+  
   let bag = DisposeBag()
-  let viewModel = AcronymsViewModel()
+  var viewModel = AcronymsViewModel()
   var acronyms = [Acronym]()
+  var data: Observable<[Acronym]> = .empty()
+  
+  var dataSource: RxTableViewSectionedAnimatedDataSource<MyAcronymSection>!
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    viewModel.loadData()
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
     tableView.delegate = nil
     tableView.dataSource = nil
     tableView.tableFooterView = UIView()
+    bindUI()
+  }
+}
+
+extension AcronymsTableViewController {
+  
+  private func configureDataSource() {
+    dataSource = RxTableViewSectionedAnimatedDataSource<MyAcronymSection>(
+      configureCell: {
+        dataSource, tableView, indexPath, item in
+        let cell = tableView.dequeueReusableCell(withIdentifier: "acronymCell", for: indexPath)
+        cell.textLabel?.text = item.short
+        cell.detailTextLabel?.text = item.long
+        return cell
+      }, canEditRowAtIndexPath: { _, _ in
+        return true
+      })
+  }
+  
+  private func bindUI() {
     
-    let data = viewModel.data.share(replay: 1)
-    data.subscribe(onNext: { [weak self] data in
-      self?.acronyms = data
-    })
-    .disposed(by: bag)
+    addAcronym.rx.tap
+      .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+      .subscribe(onNext: { [weak self] in
+        guard let self = self else { return }
+        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        let createAcronymVC = storyboard.instantiateViewController(withIdentifier: "CreateAcronym") as! CreateAcronymViewController
+        createAcronymVC.viewModel = CreateAcronymViewModel(acronym: nil, nav: self.navigationController)
+        self.navigationController?.pushViewController(createAcronymVC, animated: true)
+      })
+      .disposed(by: bag)
     
-    data.bind(to: tableView.rx
-                          .items(cellIdentifier: "acronymCell")) { index, model, cell in
-      cell.textLabel?.text = model.short
-      cell.detailTextLabel?.text = model.long
-    }
-    .disposed(by: bag)
+    refresh.rx.tap.asObservable()
+      .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+      .subscribe(onNext: { [weak self] in
+        self?.viewModel.loadData()
+      })
+      .disposed(by: bag)
+    
+    configureDataSource()
+    
+    viewModel.section.asObservable()
+      .do(onNext: { sections in
+       sections.forEach { $0.items.forEach { print($0.short)}}
+      })
+      .bind(to: tableView.rx.items(dataSource: dataSource))
+      .disposed(by: bag)
+    
+    _ = navigationController?.rx.delegate
+      .sentMessage(#selector(UINavigationControllerDelegate.navigationController(_:didShow:animated:)))
+      .map { _ in }
+      .subscribe(onNext: { [weak self] in
+        self?.viewModel.loadData()
+      })
+      .disposed(by: bag)
+    
     tableView.rx.itemSelected
-      .subscribe(onNext: { [weak self] indexPath in
+      .map { [unowned self] indexPath in
+        try! self.dataSource.model(at: indexPath) as! Acronym
+      }
+      .subscribe(onNext: { [weak self] acronym in
         guard let self = self else { return }
         let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         let detailedVC = storyboard.instantiateViewController(withIdentifier: "DetailAcronyms") as! DetailAcronymTableViewController
-        detailedVC.viewModel = DetailAcronymViewModel(acronym: self.acronyms[indexPath.row])
+        detailedVC.viewModel = DetailAcronymViewModel(acronym: acronym, nav: self.navigationController)
         self.navigationController?.pushViewController(detailedVC, animated: true)
       })
       .disposed(by: bag)
+    
+    tableView.rx.itemDeleted
+      .map { [unowned self] indexPath in
+        try! self.dataSource.model(at: indexPath) as! Acronym
+      }
+      .do(onNext: { [weak self] _ in
+        self?.viewModel.loadData()
+      })
+      .bind(to: viewModel.deleteAction.inputs)
+      .disposed(by: bag)
   }
-  
-  /*
-   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-   let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-   
-   // Configure the cell...
-   
-   return cell
-   }
-   */
-  
-  /*
-   // Override to support conditional editing of the table view.
-   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-   // Return false if you do not want the specified item to be editable.
-   return true
-   }
-   */
-  
-  /*
-   // Override to support editing the table view.
-   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-   if editingStyle == .delete {
-   // Delete the row from the data source
-   tableView.deleteRows(at: [indexPath], with: .fade)
-   } else if editingStyle == .insert {
-   // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-   }
-   }
-   */
-  
-  /*
-   // Override to support rearranging the table view.
-   override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-   
-   }
-   */
-  
-  /*
-   // Override to support conditional rearranging of the table view.
-   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-   // Return false if you do not want the item to be re-orderable.
-   return true
-   }
-   */
-  
-  /*
-   // MARK: - Navigation
-   
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-   // Get the new view controller using segue.destination.
-   // Pass the selected object to the new view controller.
-   }
-   */
-  
 }
