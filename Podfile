@@ -1,18 +1,18 @@
 # Podfile
-use_frameworks!
 platform :ios, '14.1'
 
-target 'RxAcronyms' do
-	pod 'RxTimelane', '1.0.9'
-    pod 'RxSwift', '~>5.1.1'
-    pod 'RxCocoa', '~>5.1.1'
-    pod 'RxDataSources', '~> 4.0'
-    pod 'RealmSwift', '~> 10.0'
-    pod 'RxRealm', '~> 4.0.2'
-    pod 'Action', '~> 4.0'
-end
+inhibit_all_warnings!
 
-target 'RxAcronymsTests' do
-    pod 'RxBlocking', '~>5.1.1'
-    pod 'RxTest', '~>5.1.1'
+target 'RxAcronyms' do
+  use_frameworks!
+
+	pod 'RxTimelane', '1.0.9'
+  pod 'RxSwift', '~>5.1.1'
+  pod 'RxCocoa', '~>5.1.1'
+  pod 'RxDataSources', '~> 4.0'
+  pod 'RealmSwift', '~> 10.0'
+  pod 'RxRealm', '~> 4.0.2'
+  pod 'Action', '~> 4.0'
+  pod 'RxBlocking'
+  pod 'RxTest'
 end

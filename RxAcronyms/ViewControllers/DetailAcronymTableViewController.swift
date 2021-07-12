@@ -44,3 +44,4 @@ class DetailAcronymTableViewController: UITableViewController {
       .disposed(by: bag)
   }
 }
+

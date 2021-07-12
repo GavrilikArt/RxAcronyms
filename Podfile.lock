@@ -35,12 +35,12 @@ PODS:
 DEPENDENCIES:
   - Action (~> 4.0)
   - RealmSwift (~> 10.0)
-  - RxBlocking (~> 5.1.1)
+  - RxBlocking
   - RxCocoa (~> 5.1.1)
   - RxDataSources (~> 4.0)
   - RxRealm (~> 4.0.2)
   - RxSwift (~> 5.1.1)
-  - RxTest (~> 5.1.1)
+  - RxTest
   - RxTimelane (= 1.0.9)
 
 SPEC REPOS:
@@ -74,6 +74,6 @@ SPEC CHECKSUMS:
   RxTimelane: 1579e15e7ae1d34c96a3952fe188318f6448bc5a
   TimelaneCore: 715a01e534cea5d4785309767cd9e7c012380024
 
-PODFILE CHECKSUM: ac21c2b7d598eb584d04efb50d3495b73f80d8ab
+PODFILE CHECKSUM: 3614f44f1d29160d88bcf80f83cf71e3cc1c1a56
 
 COCOAPODS: 1.10.1
